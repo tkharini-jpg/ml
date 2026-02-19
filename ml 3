@@ -1,0 +1,43 @@
+import numpy as np
+
+# Sample dataset (flattened 4x4 "images" for simplicity)
+X = np.array([
+    [0,0,0,0, 0,1,1,0, 0,1,1,0, 0,0,0,0],  # Digit 0
+    [0,0,1,0, 0,1,1,0, 0,0,1,0, 0,0,1,0],  # Digit 1
+    [1,1,1,0, 0,0,1,0, 0,1,1,0, 1,1,1,0]   # Digit 2
+])
+y = np.array([0,1,2])  # Labels
+
+# Network parameters
+input_size = X.shape[1]
+hidden_size = 5
+output_size = 3
+np.random.seed(42)
+
+# Initialize weights
+W1 = np.random.randn(input_size, hidden_size)
+b1 = np.zeros(hidden_size)
+W2 = np.random.randn(hidden_size, output_size)
+b2 = np.zeros(output_size)
+
+# Activation
+def relu(x): return np.maximum(0,x)
+def softmax(x): return np.exp(x)/np.sum(np.exp(x), axis=1, keepdims=True)
+
+# Forward pass
+Z1 = relu(X.dot(W1)+b1)
+Z2 = softmax(Z1.dot(W2)+b2)
+pred = np.argmax(Z2, axis=1)
+
+# Show input, actual output, predicted output
+print("Input(first sample):", X[0])
+print("Actual:", y[0], "Predicted:", pred[0])
+print("\nNetwork structure:\nInput:", input_size, "Hidden:", hidden_size, "Output:", output_size)
+
+Ouput:
+
+Input(first sample): [0 0 0 0 0 1 1 0 0 1 1 0 0 0 0 0]
+Actual: 0 Predicted: 0
+
+Network structure:
+Input: 16 Hidden: 5 Output: 3
