@@ -1,0 +1,41 @@
+import math
+from collections import Counter
+
+# Sample data: [Fever, Cough, Fatigue, Headache, Disease]
+data = [
+    ['Yes','Yes','Yes','No','Yes'],
+    ['Yes','Yes','No','No','Yes'],
+    ['No','Yes','Yes','Yes','No'],
+    ['Yes','No','Yes','No','Yes'],
+    ['No','No','Yes','Yes','No']
+]
+
+attrs = ["Fever","Cough","Fatigue","Headache"]
+
+def entropy(ex):
+    labels = [e[-1] for e in ex]
+    total = len(labels)
+    return -sum((c/total)*math.log2(c/total) for c in Counter(labels).values())
+
+def info_gain(ex, i):
+    total_entropy = entropy(ex)
+    vals = set(e[i] for e in ex)
+    return total_entropy - sum(len([e for e in ex if e[i]==v])/len(ex) * entropy([e for e in ex if e[i]==v]) for v in vals)
+
+def id3(ex, atts):
+    labels = [e[-1] for e in ex]
+    if all(l==labels[0] for l in labels): return labels[0]
+    if not atts: return Counter(labels).most_common(1)[0][0]
+    best = atts[[info_gain(ex,i) for i in atts].index(max([info_gain(ex,i) for i in atts]))]
+    tree = {attrs[best]: {}}
+    for v in set(e[best] for e in ex):
+        subset = [e for e in ex if e[best]==v]
+        tree[attrs[best]][v] = id3(subset, [i for i in atts if i!=best])
+    return tree
+
+tree = id3(data, list(range(len(attrs))))
+print(tree)
+
+Ouput:
+
+{'Fever': {'Yes': 'Yes', 'No': 'No'}}
