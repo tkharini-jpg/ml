@@ -1,0 +1,32 @@
+import numpy as np
+import pandas as pd
+from pgmpy.models import DiscreteBayesianNetwork
+from pgmpy.estimators import MaximumLikelihoodEstimator
+from pgmpy.inference import VariableElimination
+model=DiscreteBayesianNetwork([
+    ('free','spam'),
+    ('win','spam'),
+    ('offer','spam')
+])
+np.random.seed(0)
+data=[]
+for _ in range(200):
+  free=np.random.choice(['yes','no'])
+  win=np.random.choice(['yes','no'])
+  offer= np.random.choice(['yes','no'])
+  spam='yes' if (free=='yes' or win=='yes' or offer=='yes') else 'no'
+  data.append([free,win,offer,spam])
+  df=pd.DataFrame(data,columns=['free','win','offer','spam'])
+model.fit(df,estimator=MaximumLikelihoodEstimator)
+infer=VariableElimination(model)
+result=infer.map_query(variables=['spam'],evidence={'free':'yes','win':'yes'})
+print("spam prediction:",result)
+
+output:
+Finding Elimination Order: :   0%
+ 0/1 [00:00<?, ?it/s]
+Eliminating: offer: 100%
+ 1/1 [00:00<00:00, 67.84it/s]
+spam prediction: {'spam': 'yes'}
+
+
