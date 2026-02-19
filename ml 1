@@ -1,0 +1,38 @@
+data = [
+    ['Yes','Yes','Yes','No','Yes'],
+    ['Yes','Yes','No','No','Yes'],
+    ['No','Yes','Yes','Yes','No'],
+    ['Yes','No','Yes','No','Yes'],
+    ['No','No','Yes','Yes','No']
+]
+
+attrs = 4
+S = ["0"]*attrs       # Most specific
+G = [["?"]*attrs]     # Most general
+
+def consistent(h, x):
+    return all(hv=="?" or hv==xv for hv,xv in zip(h,x))
+
+for x,target in [(d[:-1],d[-1]) for d in data]:
+    if target=="Yes":
+        S = [sv if sv==xv else "?" for sv,xv in zip(S,x)]
+        G = [g for g in G if consistent(g,x)]
+    else:
+        G_new = []
+        for g in G:
+            for i in range(attrs):
+                if g[i]=="?":
+                    for val in ['Yes','No']:
+                        if val!=x[i]:
+                            h = g.copy(); h[i]=val; G_new.append(h)
+                elif g[i]==x[i]:
+                    h = g.copy(); h[i]="?"; G_new.append(h)
+        G = [g for g in G_new if not any(all(a=="?" or a==b for a,b in zip(other,g)) for other in G_new if other!=g)]
+
+print("S (Specific):", S)
+print("G (General):", G)
+
+Output:
+
+S (Specific): ['?', '?', '?', '?']
+G (General): [['?', '?', '?', '?']]
