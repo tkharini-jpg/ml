@@ -1,0 +1,42 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Training data
+X = np.array([800, 1000, 1200, 1500, 1800, 2000])
+Y = np.array([20, 25, 30, 38, 45, 50])
+
+# Convert X into matrix form
+X = X.reshape(-1,1)
+
+# Add bias term
+X_bias = np.hstack((np.ones((X.shape[0],1)), X))
+
+# Locally Weighted Regression function
+def lw_regression(x_query, X, Y, tau):
+    
+    m = X.shape[0]
+    W = np.eye(m)
+    
+    # Calculate weights
+    for i in range(m):
+        diff = x_query - X[i][1]
+        W[i,i] = np.exp(-(diff**2)/(2*tau**2))
+    
+    # Calculate theta
+    theta = np.linalg.inv(X.T @ W @ X) @ (X.T @ W @ Y)
+    
+    # Predict value
+    y_pred = theta[0] + theta[1]*x_query
+    return y_pred
+
+# Query point
+x_test = 1400
+tau = 300
+
+prediction = lw_regression(x_test, X_bias, Y, tau)
+
+print("Predicted Price for house size", x_test, "sq.ft =", round(prediction,2), "Lakhs")
+
+OUTPUT:
+
+Predicted Price for house size 1400 sq.ft = 34.8 Lakhs
